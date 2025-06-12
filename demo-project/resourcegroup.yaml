@@ -1,0 +1,18 @@
+apiVersion: azure.upbound.io/v1beta1
+kind: ResourceGroup
+metadata:
+  name: rg-crossplane-poc
+  labels:
+    solution-id: "1234"
+    created-by: "crossplane"
+    created-on: "2025-10-06"
+spec:
+  providerConfigRef:
+    name: default
+  forProvider:
+    location: "West Europe"
+    tags:
+      provisioner: "crossplane"
+      created-by: "crossplane"
+      solution-id: "1234"
+      created-on: "2025-10-06"

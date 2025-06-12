@@ -1,0 +1,19 @@
+# Ignore credentials and sensitive files
+creds.json
+
+# Ignore system files
+.DS_Store
+
+# Ignore Crossplane cache and logs
+*.log
+*.cache
+
+# Ignore temporary files
+*.tmp
+*.swp
+
+# Ignore node_modules (if applicable)
+node_modules/
+
+# Ignore Python cache (if applicable)
+__pycache__/
