@@ -1,0 +1,58 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xresourcegroup.crossplane.essity.dev
+spec:
+  group: crossplane.essity.dev
+  names:
+    categories:
+      - crossplane
+      - azure
+    listKind: azureResourceList
+    shortNames:
+      - xazuresql
+      - azuresql
+    kind: XResourceGroup
+    plural: xresourcegroups
+  claimNames:
+    kind: ResourceGroup
+    plural: resourcegroups
+  versions:
+    - name: v1alpha1
+      additionalPrinterColumns:
+        - jsonPath: .status.conditions[?(@.type=='Established')].status
+          name: ESTABLISHED
+          type: string
+        - jsonPath: .status.conditions[?(@.type=='Offered')].status
+          name: OFFERED
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: AGE
+          type: date
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                spec:
+                  type: object
+                  required:
+                    - region
+                    - name
+                    - solutionId
+                  properties:
+                    region:
+                      type: string
+                      enum: 
+                        - westeurope
+                        - southeastasia
+                        - northeurope
+                      default: westeurope
+                    name: 
+                      type: string
+                    solutionId:
+                      type: integer
