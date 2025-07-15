@@ -1,0 +1,15 @@
+apiVersion: platform.essity/v1alpha1
+kind: ManagedResourceGroup
+metadata:
+  name: example-resource-group
+spec:
+  region: westeurope
+  name: example-resource-group
+  subscriptionId: example-subscription-id
+  solutionId: 123
+  costCenter: example-cost-center
+  environment: dev
+  owner: example-owner
+  tags:
+    provisioner: crossplane
+    created-by: crossplane

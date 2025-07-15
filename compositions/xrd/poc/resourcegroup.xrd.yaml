@@ -1,22 +1,22 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: xresourcegroup.crossplane.essity.dev
+  name: managedresourcegroups.platform.essity
 spec:
-  group: crossplane.essity.dev
+  group: platform.essity
   names:
     categories:
       - crossplane
       - azure
     listKind: azureResourceList
     shortNames:
-      - xazuresql
-      - azuresql
-    kind: XResourceGroup
-    plural: xresourcegroups
+      - mresourcegroup
+      - mrg
+    kind: ManagedResourceGroup
+    plural: managedresourcegroups
   claimNames:
-    kind: ResourceGroup
-    plural: resourcegroups
+    kind: ManagedResourceGroupClaim
+    plural: managedresourcegroupclaims
   versions:
     - name: v1alpha1
       additionalPrinterColumns:
@@ -38,21 +38,53 @@ spec:
             spec:
               type: object
               properties:
+                metadata:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    labels:
+                      type: object
+                      additionalProperties:
+                        type: string
                 spec:
                   type: object
                   required:
                     - region
                     - name
                     - solutionId
+                    - costCenter
+                    - environment
+                    - owner
                   properties:
                     region:
                       type: string
-                      enum: 
+                      enum:
                         - westeurope
                         - southeastasia
                         - northeurope
                       default: westeurope
-                    name: 
+                    name:
                       type: string
                     solutionId:
                       type: integer
+                    costCenter:
+                      type: string
+                    environment:
+                      type: string
+                      enum:
+                        - dev
+                        - test
+                        - prod
+                      default: dev
+                    owner:
+                      type: string
+                    subscriptionId:
+                      type: string
+                    tags:
+                      type: object
+                      additionalProperties:
+                        type: string
+                      default:
+                        provisioner: crossplane
+                        created-by: crossplane

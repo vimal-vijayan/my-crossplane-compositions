@@ -1,0 +1,56 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: managedselfhostedpools.crossplane.essity.dev
+spec:
+  group: azdevops.platform.essity
+  names:
+    categories:
+      - crossplane
+      - azuredevops
+    kind: ManagedAzDevOpsSelfHostedPool
+    plural: managedselfhostedpools
+    shortNames:
+      - azselfhostedpool
+      - selfhostedpool
+  claimNames:
+    kind: ManagedAzDevOpsSelfHostedPoolClaim
+    plural: managedselfhostedpoolclaims
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                spec:
+                  type: object
+                  required:
+                    - region
+                    - resourceGroup
+                    - projectName
+                    - poolName
+                  properties:
+                    region:
+                      type: string
+                      enum:
+                        - westeurope
+                        - southeastasia
+                        - northeurope
+                      default: westeurope
+                    resourceGroup:
+                      type: string
+                    projectName:
+                      type: string
+                    poolName:
+                      type: string
+                    vmSize:
+                      type: string
+                      default: Standard_D2s_v3
+                    maxParallelism:
+                      type: integer
+                      default: 10
