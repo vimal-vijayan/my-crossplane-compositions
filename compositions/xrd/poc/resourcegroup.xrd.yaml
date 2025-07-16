@@ -37,54 +37,74 @@ spec:
           properties:
             spec:
               type: object
+              required:
+                - region
+                - name
+                - project
+                - solutionId
+                - costCenter
+                - environment
+                - owner
+                - businessContext
               properties:
-                metadata:
+                region:
+                  type: string
+                  enum:
+                    - westeurope
+                    - southeastasia
+                    - northeurope
+                  default: westeurope
+                name:
+                  type: string
+                project:
+                  type: string
+                solutionId:
+                  type: integer
+                costCenter:
+                  type: string
+                environment:
+                  type: string
+                  enum:
+                    - dev
+                    - test
+                    - uat
+                    - prod
+                    - stage
+                    - nonprod
+                    - sandbox
+                    - poc
+                  default: dev
+                owner:
+                  type: string
+                subscriptionId:
+                  type: string
+                technicalOwner:
+                  type: string
+                businessContext:
+                  type: string
+                dataClassification:
+                  type: string
+                  enum:
+                    - public
+                    - internal
+                    - confidential
+                    - restricted
+                  default: public
+                criticality:
+                  type: string
+                  enum:
+                    - low
+                    - medium
+                    - high
+                    - enterprise
+                  default: low
+                createdBy:
+                  type: string
+                  default: crossplane
+                createdDate:
+                  type: string
+                  format: date
+                otherTags:
                   type: object
-                  properties:
-                    name:
-                      type: string
-                    labels:
-                      type: object
-                      additionalProperties:
-                        type: string
-                spec:
-                  type: object
-                  required:
-                    - region
-                    - name
-                    - solutionId
-                    - costCenter
-                    - environment
-                    - owner
-                  properties:
-                    region:
-                      type: string
-                      enum:
-                        - westeurope
-                        - southeastasia
-                        - northeurope
-                      default: westeurope
-                    name:
-                      type: string
-                    solutionId:
-                      type: integer
-                    costCenter:
-                      type: string
-                    environment:
-                      type: string
-                      enum:
-                        - dev
-                        - test
-                        - prod
-                      default: dev
-                    owner:
-                      type: string
-                    subscriptionId:
-                      type: string
-                    tags:
-                      type: object
-                      additionalProperties:
-                        type: string
-                      default:
-                        provisioner: crossplane
-                        created-by: crossplane
+                  additionalProperties:
+                    type: string

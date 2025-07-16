@@ -14,30 +14,39 @@ spec:
       input:
         apiVersion: gotemplating.fn.crossplane.io/v1beta1
         kind: GoTemplate
+        source: Inline
         inline:
           template: |
             apiVersion: azure.upbound.io/v1beta1
             kind: ResourceGroup
             metadata:
-              name: "rg-{{ .observed.composite.resource.spec.name }}-{{ .observed.composite.resource.spec.region }}"
+              name: "rg-{{ .observed.composite.resource.spec.name }}-{{ .observed.composite.resource.spec.environment }}"
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: resourcegroup
             spec:
               providerConfigRef:
                 name: {{ .observed.composite.resource.spec.providerConfigRef.name | default "default" }}
-                labels:
-                  ${{ - range $key, $value := .observed.composite.resource.metadata.labels }}
-                  {{ $key }}: "{{ $value }}"
-                  ${{- end }}
               forProvider:
                 location: {{ .observed.composite.resource.spec.region }}
                 tags:
+                  app: {{ .observed.composite.resource.spec.project }}
+                  business-context: {{ .observed.composite.resource.spec.businessContext }}
+                  data-classification: {{ .observed.composite.resource.spec.dataClassification | default "public" }}
+                  technical-owner: {{ .observed.composite.resource.spec.technicalOwner | default .observed.composite.resource.spec.owner }}
+                  criticality: {{ .observed.composite.resource.spec.criticality | default "low" }}
                   solution-id: "{{ .observed.composite.resource.spec.solutionId }}"
                   cost-center: "{{ .observed.composite.resource.spec.costCenter }}"
                   environment: "{{ .observed.composite.resource.spec.environment }}"
                   owner: "{{ .observed.composite.resource.spec.owner }}"
-                  created-by: "crossplane"
-                  ${{- range $key, $value := .observed.composite.resource.spec.tags }}
+                  created-by: "{{ .observed.composite.resource.spec.createdBy | default "crossplane" }}"
+                  created-date: "{{ .observed.composite.resource.spec.createdDate | default (now | date "2006-01-02") }}"
+                  {{- range $key, $value := .observed.composite.resource.spec.otherTags }}
                   {{ $key }}: "{{ $value }}"
-                  ${{- end }}
+                  {{- end }}
+    - step: detect-ready-resource-group
+      functionRef:
+        name: upbound-function-auto-ready
+
     # - step: create-resource-group
     #   functionRef:
     #     name: function-patch-and-transform

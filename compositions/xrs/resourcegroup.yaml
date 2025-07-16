@@ -5,11 +5,17 @@ metadata:
 spec:
   region: westeurope
   name: example-resource-group
+  project: example-project
   subscriptionId: example-subscription-id
   solutionId: 123
   costCenter: example-cost-center
   environment: dev
   owner: example-owner
-  tags:
+  technicalOwner: "vimal.vijayan@essity.com"
+  businessContext: "crossplane poc"
+  dataClassification: public
+  criticality: low
+  createdBy: crossplane
+  createdDate: "2023-10-01"
+  otherTags:
     provisioner: crossplane
-    created-by: crossplane
