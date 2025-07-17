@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: "2025-07-17T06:48:04Z"
+  labels:
+    kubernetes.io/metadata.name: opentofu-demo
+  name: opentofu-demo
+  resourceVersion: "2470256"
+  uid: 9f05e5c1-d131-407a-a5e7-5a56f79ebf53
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active

@@ -1,0 +1,117 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: comp-azure-landingzone
+spec:
+  compositeTypeRef:
+    apiVersion: platform.essity/v1alpha1
+    kind: AzureLandingZone
+  mode: Pipeline
+  pipeline:
+    - step: create-terraform-remote-workspace
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        metadata:
+          name: terraform-remote-workspaces
+        patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.name"
+          toFieldPath: "spec.forProvider.workspace_name"
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.parameters.projectName"
+          toFieldPath: "spec.forProvider.project_name"
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.parameters.environment"
+          toFieldPath: "spec.forProvider.environment"
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.parameters.description"
+          toFieldPath: "spec.forProvider.description"
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.parameters.tags"
+          toFieldPath: "spec.forProvider.tags"
+        resources:
+        - name: set-terraform-remote-workspace
+          base:
+            apiVersion: opentofu.upbound.io/v1beta1
+            kind: Workspace
+            metadata:
+              name: create-terraform-remote-workspace
+            spec:
+              forProvider:
+                source: Remote
+                module: git::https://github.com/crossplane/tf?ref=main
+                env:
+                  - name: TF_TOKEN_app_terraform
+                    configMapKeyRef:
+                      key: app_terraform
+                      name: provider-opentofu-test
+                      namespace: default
+                  - name: TF_WORKSPACE
+                    configMapKeyRef:
+                      key: envfromconfigmap
+                      name: provider-opentofu-test
+                      namespace: default
+                vars:
+                  - key: workspace_name
+                    valueFromFieldPath: "spec.name"
+                  - key: project_name
+                    valueFromFieldPath: "spec.parameters.projectName"
+                  - key: environment
+                    valueFromFieldPath: "spec.parameters.environment"
+                  - key: description
+                    valueFromFieldPath: "spec.parameters.description"
+                  - key: tags
+                    valueFromFieldPath: "spec.parameters.tags"
+
+    - step: create-azure-landingzone
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        metadata:
+          name: azure-landingzone
+        resources:
+        - name: provision-azure-landingzone
+          base:
+            apiVersion: opentofu.upbound.io/v1beta1
+            kind: ApplyConfiguration
+            metadata:
+              name: apply-azure-landingzone
+            spec:
+              forProvider:
+                source: Remote
+                module: git::https://github.com/crossplane/tf?ref=main
+                env:
+                  - name: TF_TOKEN_app_terraform
+                    configMapKeyRef:
+                      key: app_terraform
+                      name: provider-opentofu-test
+                      namespace: default
+                  - name: TF_WORKSPACE
+                    configMapKeyRef:
+                      key: envfromconfigmap
+                      name: provider-opentofu-test
+                      namespace: default
+                vars:
+                  - key: app_name
+                    valueFromFieldPath: "spec.name"
+                  - key: owners
+                    valueFromFieldPath: "spec.parameters.owners"
+                  - key: environment
+                    valueFromFieldPath: "spec.parameters.environment"
+                  - key: description
+                    valueFromFieldPath: "spec.parameters.description"
+                  - key: tags
+                    valueFromFieldPath: "spec.parameters.tags"
+                  - key: resource_group_name
+                    valueFromFieldPath: "spec.parameters.resourceGroupName"
+                  - key: location
+                    valueFromFieldPath: "spec.parameters.location"
+                  - key: solution_id
+                    valueFromFieldPath: "spec.parameters.solutionId"
+                  - key: network_configuration
+                    valueFromFieldPath: "spec.parameters.networkConfiguration"
