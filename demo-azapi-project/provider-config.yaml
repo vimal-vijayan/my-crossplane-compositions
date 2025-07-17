@@ -1,0 +1,11 @@
+apiVersion: azapi.upbound.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: azapi
+spec:
+  credentials:
+    secretRef:
+      key: creds
+      name: azapi-creds
+      namespace: crossplane-system
+    source: Secret

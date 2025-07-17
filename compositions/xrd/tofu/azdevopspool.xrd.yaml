@@ -1,0 +1,52 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: azdevopspool.platform.essity
+spec:
+  group: platform.essity
+  names:
+    kind: AzDevOpsPools
+    listKind: AzDevOpsPoolsList
+    plural: azdevopspools
+    singular: azdevopspool
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                subscriptionId:
+                  type: string
+                resourceGroupName:
+                  type: string
+                location:
+                  type: string
+                  default: westeurope
+                projectName:
+                  type: string
+                poolName:
+                  type: string
+                poolType:
+                  type: string
+                  enum:
+                    - build
+                    - deployment
+                    - release
+                tags:
+                  type: object
+                  additionalProperties:
+                    type: string
+              required:
+                - subscriptionId
+                - resourceGroupName
+                - location
+                - projectName
+                - poolName
+                - poolType
