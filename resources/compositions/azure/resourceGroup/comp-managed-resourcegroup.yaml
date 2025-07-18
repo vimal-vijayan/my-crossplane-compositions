@@ -1,0 +1,88 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: managed-resourcegroup
+spec:
+  compositeTypeRef:
+    apiVersion: platform.essity/v1alpha1
+    kind: ManagedResourceGroup
+  mode: Pipeline
+  pipeline:
+    - step: create-resource-groups
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            apiVersion: azure.upbound.io/v1beta1
+            kind: ResourceGroup
+            metadata:
+              name: "rg-{{ .observed.composite.resource.spec.name }}-{{ .observed.composite.resource.spec.environment }}"
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: resourcegroup
+            spec:
+              providerConfigRef:
+                name: {{ .observed.composite.resource.spec.providerConfigRef.name | default "default" }}
+              forProvider:
+                location: {{ .observed.composite.resource.spec.region }}
+                tags:
+                  app: {{ .observed.composite.resource.spec.project }}
+                  business-context: {{ .observed.composite.resource.spec.businessContext }}
+                  data-classification: {{ .observed.composite.resource.spec.dataClassification | default "public" }}
+                  technical-owner: {{ .observed.composite.resource.spec.technicalOwner | default .observed.composite.resource.spec.owner }}
+                  criticality: {{ .observed.composite.resource.spec.criticality | default "low" }}
+                  solution-id: "{{ .observed.composite.resource.spec.solutionId }}"
+                  cost-center: "{{ .observed.composite.resource.spec.costCenter }}"
+                  environment: "{{ .observed.composite.resource.spec.environment }}"
+                  owner: "{{ .observed.composite.resource.spec.owner }}"
+                  created-by: "{{ .observed.composite.resource.spec.createdBy | default "crossplane" }}"
+                  created-date: "{{ .observed.composite.resource.spec.createdDate | default (now | date "2006-01-02") }}"
+                  {{- range $key, $value := .observed.composite.resource.spec.otherTags }}
+                  {{ $key }}: "{{ $value }}"
+                  {{- end }}
+    - step: detect-ready-resource-group
+      functionRef:
+        name: upbound-function-auto-ready
+
+    # - step: create-resource-group
+    #   functionRef:
+    #     name: function-patch-and-transform
+    #   input:
+    #     apiVersion: pt.fn.crossplane.io/v1beta1
+    #     kind: Resources
+    #     resources:
+    #       - name: resource-group
+    #         base:
+    #           apiVersion: azure.upbound.io/v1beta1
+    #           kind: ResourceGroup
+    #           metadata:
+    #             name: ""
+    #           spec:
+    #             forProvider:
+    #               location: westeurope
+    #               tags:
+    #                 provisioner: crossplane
+    #         patches:
+    #           - type: FromCompositeFieldPath
+    #             fromFieldPath: spec.region
+    #             toFieldPath: spec.forProvider.location
+    #           - type: FromCompositeFieldPath
+    #             fromFieldPath: spec.name
+    #             toFieldPath: metadata.name
+    #           - type: FromCompositeFieldPath
+    #             fromFieldPath: spec.solutionId
+    #             toFieldPath: spec.forProvider.tags["solution-id"]
+    #             transforms:
+    #               - type: string
+    #                 string:
+    #                   fmt: "%d"
+    #           - type: FromCompositeFieldPath
+    #             fromFieldPath: metadata.name
+    #             toFieldPath: spec.forProvider.tags["created-by"]
+    #             transforms:
+    #               - type: string
+    #                 string:
+    #                   fmt: "crossplane"

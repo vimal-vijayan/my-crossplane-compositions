@@ -1,0 +1,34 @@
+apiVersion: resources.azapi.upbound.io/v1beta1
+kind: Resource
+metadata:
+  name: azapistorageaccount1
+spec:
+  providerConfigRef:
+    name: azapi
+  forProvider:
+    type: "Microsoft.Storage/storageAccounts@2023-05-01"
+    parentId: "/subscriptions/f2024049-e6cb-4489-9270-6d0d6cd65018/resourceGroups/rg-example-resource-group-dev"
+    location: "westeurope"
+    name: "crossplanewithcet"
+    schemaValidationEnabled: false
+    ignoreBodyChanges:
+      - "properties.accessTier"
+      - "properties.kind"
+    ignoreMissingProperty: false
+    identity:
+      - type: SystemAssigned
+    locks: []
+    responseExportValues: []
+    tags:
+      app: "example-app"
+      business-context: "example-business"
+    body: |-
+      {
+        "sku": { 
+          "name": "Standard_LRS" 
+        },
+        "kind": "StorageV2",
+        "properties": { 
+          "accessTier": "Hot" 
+        }
+      }

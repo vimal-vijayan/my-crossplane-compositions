@@ -1,0 +1,110 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: managedresourcegroups.platform.essity
+spec:
+  group: platform.essity
+  names:
+    categories:
+      - crossplane
+      - azure
+    listKind: azureResourceList
+    shortNames:
+      - mresourcegroup
+      - mrg
+    kind: ManagedResourceGroup
+    plural: managedresourcegroups
+  claimNames:
+    kind: ManagedResourceGroupClaim
+    plural: managedresourcegroupclaims
+  versions:
+    - name: v1alpha1
+      additionalPrinterColumns:
+        # - jsonPath: .status.conditions[?(@.type=='Established')].status
+        #   name: ESTABLISHED
+        #   type: string
+        # - jsonPath: .status.conditions[?(@.type=='Offered')].status
+        #   name: OFFERED
+        #   type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: AGE
+          type: date
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - region
+                - name
+                - project
+                - solutionId
+                - costCenter
+                - environment
+                - owner
+                - businessContext
+              properties:
+                region:
+                  type: string
+                  enum:
+                    - westeurope
+                    - southeastasia
+                    - northeurope
+                  default: westeurope
+                name:
+                  type: string
+                project:
+                  type: string
+                solutionId:
+                  type: integer
+                costCenter:
+                  type: string
+                environment:
+                  type: string
+                  enum:
+                    - dev
+                    - test
+                    - uat
+                    - prod
+                    - stage
+                    - nonprod
+                    - sandbox
+                    - poc
+                  default: dev
+                owner:
+                  type: string
+                subscriptionId:
+                  type: string
+                technicalOwner:
+                  type: string
+                businessContext:
+                  type: string
+                dataClassification:
+                  type: string
+                  enum:
+                    - public
+                    - internal
+                    - confidential
+                    - restricted
+                  default: public
+                criticality:
+                  type: string
+                  enum:
+                    - low
+                    - medium
+                    - high
+                    - enterprise
+                  default: low
+                createdBy:
+                  type: string
+                  default: crossplane
+                createdDate:
+                  type: string
+                  format: date
+                otherTags:
+                  type: object
+                  additionalProperties:
+                    type: string
